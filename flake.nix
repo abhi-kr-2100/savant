@@ -23,11 +23,17 @@
       in
       {
         devShells.default = pkgs.mkShell {
-          packages = (
-            with pkgs;
-            [
-            ]
-          );
+          packages = with pkgs; [
+            electron # v41.9.1
+            nodejs
+            pnpm
+            typescript-language-server
+          ];
+
+          env = {
+            ELECTRON_OVERRIDE_DIST_PATH = "${pkgs.electron}/bin";
+            ELECTRON_SKIP_BINARY_DOWNLOAD = "1";
+          };
         };
       }
     );
