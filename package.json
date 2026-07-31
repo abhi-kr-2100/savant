@@ -1,0 +1,25 @@
+{
+  "name": "savant",
+  "version": "1.0.0",
+  "description": "Learn anything. Then retain it for life.",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "prestart": "pnpm build",
+    "start": "electron ."
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.17.0",
+      "onFail": "download"
+    }
+  },
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "electron": "41.9.1",
+    "typescript": "^7.0.2"
+  }
+}
