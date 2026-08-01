@@ -1,5 +1,7 @@
+import LandingPage from "@/components/LandingPage";
+
 function App() {
-  return <h1>Savant</h1>;
+  return <LandingPage />;
 }
 
 export default App;
