@@ -1,23 +1,23 @@
-import type { Plugin } from 'vite';
-import { parse, type DefaultTreeAdapterMap, type Token } from 'parse5';
-import parseContentSecurityPolicy from 'content-security-policy-parser';
+import type { Plugin } from "vite";
+import { parse, type DefaultTreeAdapterMap, type Token } from "parse5";
+import parseContentSecurityPolicy from "content-security-policy-parser";
 
-type Node = DefaultTreeAdapterMap['node'];
-type Element = DefaultTreeAdapterMap['element'];
+type Node = DefaultTreeAdapterMap["node"];
+type Element = DefaultTreeAdapterMap["element"];
 type Location = Token.Location;
 type AttrValWithLocation = { valueStart: number; value: string };
 
 const DEFAULT_DEV_SOURCES: Record<string, string[]> = {
-  'connect-src': ['ws://localhost:5173'],
-  'style-src': ["'unsafe-inline'"],
+  "connect-src": ["ws://localhost:5173"],
+  "style-src": ["'unsafe-inline'"],
 };
 
-const CSP_HTTP_EQUIV = 'content-security-policy';
-const HTTP_EQUIV = 'http-equiv';
+const CSP_HTTP_EQUIV = "content-security-policy";
+const HTTP_EQUIV = "http-equiv";
 
 function* walk(node: Node): Generator<Node> {
   yield node;
-  if ('childNodes' in node) {
+  if ("childNodes" in node) {
     for (const child of node.childNodes) yield* walk(child);
   }
 }
@@ -28,7 +28,7 @@ function isCspMeta(node: Element): boolean {
   );
 }
 
-const WHITESPACE = [' ', '\t', '\n'];
+const WHITESPACE = [" ", "\t", "\n"];
 function isWhitespace(s: string): boolean {
   if (s.length === 0) {
     return false;
@@ -39,17 +39,17 @@ function isWhitespace(s: string): boolean {
 function attrValue(html: string, location: Location): AttrValWithLocation {
   const raw = html.slice(location.startOffset, location.endOffset);
 
-  let quote = raw.indexOf('=') + 1;
+  let quote = raw.indexOf("=") + 1;
   while (quote < raw.length && isWhitespace(raw[quote]!)) {
     quote++;
   }
 
   if (quote >= raw.length) {
-    throw new Error('CSP meta tag has no content');
+    throw new Error("CSP meta tag has no content");
   }
 
   if (raw[quote] !== '"' && raw[quote] !== "'") {
-    throw new Error('CSP meta tag content attribute must be quoted');
+    throw new Error("CSP meta tag content attribute must be quoted");
   }
 
   return { valueStart: location.startOffset + quote + 1, value: raw.slice(quote + 1, -1) };
@@ -59,25 +59,25 @@ function findCspMetaContent(html: string): AttrValWithLocation {
   const doc = parse(html, { sourceCodeLocationInfo: true });
 
   for (const node of walk(doc)) {
-    if (!('tagName' in node) || node.tagName !== 'meta' || !isCspMeta(node)) {
+    if (!("tagName" in node) || node.tagName !== "meta" || !isCspMeta(node)) {
       continue;
     }
 
-    const location = node.sourceCodeLocation?.attrs?.['content'];
+    const location = node.sourceCodeLocation?.attrs?.["content"];
     if (!location) {
-      throw new Error('CSP meta tag must have a content attribute');
+      throw new Error("CSP meta tag must have a content attribute");
     }
 
     return attrValue(html, location);
   }
 
-  throw new Error('index.html must contain a Content-Security-Policy meta tag');
+  throw new Error("index.html must contain a Content-Security-Policy meta tag");
 }
 
 function serialize(policy: Map<string, string[]>): string {
   return [...policy]
-    .map(([name, sources]) => (sources.length ? `${name} ${sources.join(' ')}` : name))
-    .join('; ');
+    .map(([name, sources]) => (sources.length ? `${name} ${sources.join(" ")}` : name))
+    .join("; ");
 }
 
 function mergeSources(
@@ -93,7 +93,7 @@ function mergeSources(
 
 function replaceValue(
   html: string,
-  valueWithLocation:AttrValWithLocation,
+  valueWithLocation: AttrValWithLocation,
   replacement: string,
 ): string {
   const { valueStart, value } = valueWithLocation;
@@ -102,9 +102,9 @@ function replaceValue(
 
 export function rendererCsp(devSources: Record<string, string[]> = DEFAULT_DEV_SOURCES): Plugin {
   return {
-    name: 'renderer-csp',
+    name: "renderer-csp",
     transformIndexHtml: {
-      order: 'post',
+      order: "post",
       handler: (html, ctx) => {
         if (!ctx.server) {
           return html;

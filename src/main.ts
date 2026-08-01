@@ -1,5 +1,5 @@
-import { app, BrowserWindow } from 'electron';
-import path from 'node:path';
+import { app, BrowserWindow } from "electron";
+import path from "node:path";
 
 function isSafeDevServerUrl(raw: string | undefined): raw is string {
   if (!raw) {
@@ -8,10 +8,10 @@ function isSafeDevServerUrl(raw: string | undefined): raw is string {
 
   try {
     const url = new URL(raw);
-    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
       return false;
     }
-    if (url.hostname !== 'localhost' && url.hostname !== '127.0.0.1' && url.hostname !== '::1') {
+    if (url.hostname !== "localhost" && url.hostname !== "127.0.0.1" && url.hostname !== "::1") {
       return false;
     }
     return true;
@@ -27,10 +27,10 @@ void app.whenReady().then(() => {
   if (!app.isPackaged && isSafeDevServerUrl(devServerUrl)) {
     void win.loadURL(devServerUrl);
   } else {
-    void win.loadFile(path.join(import.meta.dirname, 'renderer', 'index.html'));
+    void win.loadFile(path.join(import.meta.dirname, "renderer", "index.html"));
   }
 });
 
-app.on('window-all-closed', () => {
+app.on("window-all-closed", () => {
   app.quit();
 });
